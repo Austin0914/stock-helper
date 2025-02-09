@@ -302,7 +302,8 @@ def main():
     return result()
 
 if __name__ == "__main__":
-    return main()
+    main()
+    # 有更新嗎?
 
 """
 # 開發進度
