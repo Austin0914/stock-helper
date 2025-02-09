@@ -299,10 +299,10 @@ def main():
     howManyDaysNeedToGet,opendate_FromToday = caluate_date()
     get_rail_data(howManyDaysNeedToGet,opendate_FromToday)
     update_CHECKandDATA(howManyDaysNeedToGet,opendate_FromToday)
-    result()
+    return result()
 
 if __name__ == "__main__":
-    main()
+    return main()
 
 """
 # 開發進度
@@ -315,6 +315,7 @@ if __name__ == "__main__":
     - yfinace to get today price [🆘]下載api時間太久->[OK✅]更換api
         - [OK✅] get rail data
         - [OK✅] clean data 
+        - check if the data is already downloaded
 - refresh data->
     - [OK✅] modify the date
     - [OK✅] caluate the avg BS
