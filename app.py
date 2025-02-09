@@ -30,6 +30,7 @@ def handle_message(event):
     if incoming_text == "投信":
         # 呼叫 get_data.py 裡的 main 函數
         # reply_text = f"今日符合條件的有:{get_data.main()}"
+        reply_text = '成功讀到訊息'
     else:
         reply_text = f"未處理的訊息: {incoming_text}"
     line_bot_api.reply_message(
@@ -38,5 +39,4 @@ def handle_message(event):
     )
 
 if __name__ == '__main__':
-    # 預設監聽 5000 port，可依實際部署環境進行設定
-    app.run(debug=True)
+    app.run()
