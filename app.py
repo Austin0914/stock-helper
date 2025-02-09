@@ -29,7 +29,7 @@ def handle_message(event):
     incoming_text = event.message.text.strip()
     if incoming_text == "投信":
         # 呼叫 get_data.py 裡的 main 函數
-        reply_text = f"今日符合條件的有:{get_data.main()}"
+        # reply_text = f"今日符合條件的有:{get_data.main()}"
     else:
         reply_text = f"未處理的訊息: {incoming_text}"
     line_bot_api.reply_message(
