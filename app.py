@@ -32,8 +32,7 @@ def callback():
 def handle_message(event):
     incoming_text = event.message.text.strip()
     if "投信" in incoming_text:
-        line_bot_api.reply_message(
-            event.reply_token,
+        line_bot_api.push_message(
             TextSendMessage('獲取投信買賣超資訊中，請稍後...')
         )
         company_name = stock_info.main()
@@ -47,8 +46,7 @@ def handle_message(event):
             model="gemini-2.0-flash", contents="隨機給我一句在股市交易的經典名言，並且不要有任何其他的描述語句。"
         )
         reply_text = f"{response.text}"
-    line_bot_api.reply_message(
-        event.reply_token,
+    line_bot_api.push_message(
         TextSendMessage(text=reply_text)
     )
 
