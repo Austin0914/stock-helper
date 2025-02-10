@@ -1,5 +1,4 @@
 import os
-import asyncio
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
@@ -30,35 +29,32 @@ def callback():
         abort(400)
     return 'OK'
 
-async def run_stock_info(event):
-    """
-    非同步執行 stock_info.main() 並回覆結果
-    """
-    company_name = await asyncio.to_thread(stock_info.main) # 在獨立的執行緒中執行 stock_info.main()
+def run_stock_info(event):
+    company_name = stock_info.main() 
     if len(company_name) == 0:
         reply_text = "今日無符合條件的公司"
     else:
         reply_text = f"今日符合條件的有: {', '.join(company_name)}"
 
-    await line_bot_api.push_message_async( # 使用 push_message_async 發送結果
+    line_bot_api.push_message(
         event.source.user_id,
         TextSendMessage(text=reply_text)
     )
 
 @handler.add(MessageEvent, message=TextMessage)
-async def handle_message(event):
+def handle_message(event):
     incoming_text = event.message.text.strip()
     if "投信" in incoming_text:
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage('獲取投信買賣超資訊中，請稍後...')
         )
-        await line_bot_api.show_loading_animation(ShowLoadingAnimationRequest(chatId=event.source.user_id, loadingSeconds=60))
-        asyncio.create_task(run_stock_info(event))
+        line_bot_api.show_loading_animation(ShowLoadingAnimationRequest(chatId=event.source.user_id, loadingSeconds=60))
+        run_stock_info(event)
     else:
         client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
         response = client.models.generate_content(
-            model="gemini-2.0-flash", contents="隨機給我一句在股市交易的經典名言，並且不要有任何其他的描述語句。"
+            model="gemini-2.0-flash", contents="隨機給我一句在股市交易的名言，並且不要有任何其他的描述語句。"
         )
         reply_text = f"{response.text}"
         line_bot_api.reply_message(
