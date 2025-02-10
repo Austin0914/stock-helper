@@ -32,7 +32,15 @@ def callback():
 def handle_message(event):
     incoming_text = event.message.text.strip()
     if "投信" in incoming_text:
-        reply_text = f"今日符合條件的有: {', '.join(stock_info.main())}"
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage('獲取投信買賣超資訊中，請稍後...')
+        )
+        company_name = stock_info.main()
+        if len(company_name) == 0:
+            reply_text = "今日無符合條件的公司"
+        else:
+            reply_text = f"今日符合條件的有: {', '.join(company_name)}"
     else:
         client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
         response = client.models.generate_content(
