@@ -293,7 +293,7 @@ def result():
             if today != 0:
                 if abs(price * today) >= 30000:
                     find_company.append(company_name)
-    print(find_company) 
+    return find_company
 
 def main():
     howManyDaysNeedToGet,opendate_FromToday = caluate_date()
