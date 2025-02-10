@@ -44,7 +44,7 @@ def handle_message(event):
     else:
         client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
         response = client.models.generate_content(
-            model="gemini-2.0-flash", contents="給我一句在股市交易的經典名言，並且不要有任何其他的描述語句。"
+            model="gemini-2.0-flash", contents="隨機給我一句在股市交易的經典名言，並且不要有任何其他的描述語句。"
         )
         reply_text = f"{response.text}"
     line_bot_api.reply_message(
