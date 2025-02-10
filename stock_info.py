@@ -301,10 +301,6 @@ def main():
     update_CHECKandDATA(howManyDaysNeedToGet,opendate_FromToday)
     return result()
 
-if __name__ == "__main__":
-    main()
-    # 有更新嗎?
-
 """
 # 開發進度
 - [OK✅] know how many didn't load->(to reduce request same day data)

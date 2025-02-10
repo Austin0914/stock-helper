@@ -4,7 +4,9 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
-import get_data  # 確認 get_data.py 在同一個資料夾下或設定好 Python 路徑
+from google import genai
+
+import stock_info  
 
 app = Flask(__name__)
 
@@ -29,16 +31,18 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     incoming_text = event.message.text.strip()
-    if incoming_text == "投信":
-        # 呼叫 get_data.py 裡的 main 函數
-        # reply_text = f"今日符合條件的有:{get_data.main()}"
-        reply_text = '成功讀到訊息'
+    if "投信" in incoming_text:
+        reply_text = f"今日符合條件的有: {', '.join(stock_info.main())}"
     else:
-        reply_text = f"未處理的訊息: {incoming_text}"
+        client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+        response = client.models.generate_content(
+            model="gemini-2.0-flash", contents="給我一句在股市交易的經典名言，並且不要有任何其他的描述語句。"
+        )
+        reply_text = f"{response.text}"
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=reply_text)
     )
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=10000,debug=True)
+    app.run(host="0.0.0.0", port=10000)
