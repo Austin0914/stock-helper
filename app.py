@@ -55,17 +55,16 @@ async def handle_message(event):
         )
         await line_bot_api.show_loading_animation(ShowLoadingAnimationRequest(chatId=event.source.user_id, loadingSeconds=60))
         asyncio.create_task(run_stock_info(event))
-        company_name = stock_info.main()
     else:
         client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
         response = client.models.generate_content(
             model="gemini-2.0-flash", contents="隨機給我一句在股市交易的經典名言，並且不要有任何其他的描述語句。"
         )
         reply_text = f"{response.text}"
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=reply_text)
-    )
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=reply_text)
+        )
     
 
 if __name__ == '__main__':
