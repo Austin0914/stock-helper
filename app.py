@@ -3,7 +3,6 @@ from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
-from linebot.v3.messaging import ShowLoadingAnimationRequest
 
 from google import genai
 
@@ -49,7 +48,7 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage('獲取投信買賣超資訊中，請稍後...')
         )
-        line_bot_api.show_loading_animation(ShowLoadingAnimationRequest(chatId=event.source.user_id, loadingSeconds=60))
+        # line_bot_api.show_loading_animation(ShowLoadingAnimationRequest(chatId=event.source.user_id, loadingSeconds=60))
         run_stock_info(event)
     else:
         client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
