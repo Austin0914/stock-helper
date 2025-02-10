@@ -61,7 +61,7 @@ def caluate_investmentbanks_avgBS(howManyDaysNeedToGet,opendate_FromToday):
     all_data["前9日加總買賣超"] = 0
     all_data["當日投信買賣超"] = 0
 
-    for i in range(howManyDaysNeedToGet):
+    for i in range(len(opendate_FromToday)):
         time_today = opendate_FromToday[i].replace('-', '')
         index_str = "當日投信買賣超" if i == 0 else "前9日加總買賣超"
         byorsell_data = pd.read_csv(f"./data/untreated_data/twse_investmentbanks_{time_today}.csv")
