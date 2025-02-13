@@ -89,6 +89,7 @@ def get_stock():
             conn, cursor = get_connection()
         cursor.execute("SELECT * FROM stock_info")
         results = cursor.fetchall()
+        conn.commit()
         return results
     except Exception as e:
         print(e)

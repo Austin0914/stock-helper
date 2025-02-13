@@ -42,7 +42,8 @@ def send_resultToSubscribers():
     subscribers = database.get_subscribers()
     if not subscribers:
         return
-    reply_text = database.get_result(datetime.datetime.now(pytz.timezone("Asia/Taipei")).strftime("%Y-%m-%d"))
+    # reply_text = database.get_result(datetime.datetime.now(pytz.timezone("Asia/Taipei")).strftime("%Y-%m-%d"))
+    reply_text = database.get_result("2025-02-13")
     print(reply_text)
     for subscriber_id in subscribers:
         print(subscriber_id[1])
