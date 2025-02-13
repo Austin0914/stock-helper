@@ -43,9 +43,11 @@ def send_resultToSubscribers():
     if not subscribers:
         return
     reply_text = database.get_result(datetime.datetime.now(pytz.timezone("Asia/Taipei")).strftime("%Y-%m-%d"))
+    print(reply_text)
     for subscriber_id in subscribers:
+        print(subscriber_id)
         line_bot_api.push_message(
-            subscriber_id,
+            str(subscriber_id),
             TextSendMessage(text=reply_text)
         )
     database.close_connection()
