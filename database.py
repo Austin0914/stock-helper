@@ -23,7 +23,8 @@ def get_connection():
     print("Connection established")
     return conn,conn.cursor()
 
-def close_connection(conn,cursor):
+def close_connection():
+    global conn, cursor
     conn.commit()
     cursor.close()
     conn.close()
