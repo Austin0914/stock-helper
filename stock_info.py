@@ -292,7 +292,7 @@ def result(todaytime):
         if abs(nine_days) <= 5:
             if today != 0:
                 if abs(price * today) >= 30000:
-                    find_company.append([todaytime,all_data[i,'公司名稱'],company_code,price,today])
+                    find_company.append([todaytime,all_data.loc[i,'公司名稱'],company_code,price,today])
     return find_company
 
 def main():
