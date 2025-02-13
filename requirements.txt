@@ -5,4 +5,5 @@ pandas
 yfinance
 beautifulsoup4
 gunicorn
-google-genai
+"psycopg[binary,pool]"
+pytz

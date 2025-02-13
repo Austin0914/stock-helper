@@ -275,31 +275,31 @@ def updateCompany_clean(html_content_tpex,html_content_twse):
     df = pd.DataFrame(final, columns=columns)
     df.to_csv("./data/company.csv", index=False, encoding="utf-8")
 
-def result():
+def result(todaytime):
     find_company = []
     all_data = pd.read_csv('./data/all.csv')
-    for i,company_name in enumerate(all_data[all_data.columns[0]]):
+    for i,company_code in enumerate(all_data[all_data.columns[0]]):
         price = all_data.loc[i,'今日價格']
         nine_days = all_data.loc[i,'前9日加總買賣超']
         today = all_data.loc[i,'當日投信買賣超']
         try:
             price = float(price) if price is not None else None
             nine_days = float(nine_days) if nine_days is not None else None
-            today = float(today) if today is not None else None
+            today = int(today) if today is not None else None
         except ValueError:
             continue
 
         if abs(nine_days) <= 5:
             if today != 0:
                 if abs(price * today) >= 30000:
-                    find_company.append(company_name)
+                    find_company.append([todaytime,all_data[i,'公司名稱'],company_code,price,today])
     return find_company
 
 def main():
     howManyDaysNeedToGet,opendate_FromToday = caluate_date()
     get_rail_data(howManyDaysNeedToGet,opendate_FromToday)
     update_CHECKandDATA(howManyDaysNeedToGet,opendate_FromToday)
-    return result()
+    return result(opendate_FromToday[0])
 
 """
 # 開發進度
