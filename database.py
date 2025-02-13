@@ -51,7 +51,7 @@ def add_subscriber(line_chat_id):
         cursor.execute("""
             INSERT INTO linebot (line_chat_id)
             VALUES (%s)
-        """,(line_chat_id))
+        """,(line_chat_id,))
         return True
     except Exception as e:
         print(e)
@@ -62,7 +62,7 @@ def delete_subscriber(line_chat_id):
         global conn, cursor
         if conn is None or cursor is None: 
             conn, cursor = get_connection()
-        cursor.execute("DELETE FROM linebot WHERE line_chat_id = %s",(line_chat_id))
+        cursor.execute("DELETE FROM linebot WHERE line_chat_id = %s",(line_chat_id,))
         return True
     except Exception as e:
         print(e)
