@@ -24,15 +24,17 @@ def get_connection():
     return conn,conn.cursor()
 
 def close_connection(conn,cursor):
-    global conn, cursor
     conn.commit()
     cursor.close()
     conn.close()
+    conn = None
+    cursor = None
 
 def get_subscribers():
     try:
         global conn, cursor
-        if conn is None or cursor is None: conn, cursor = get_connection()
+        if conn is None or cursor is None: 
+            conn, cursor = get_connection()
         cursor.execute("SELECT * FROM linebot")
         results = cursor.fetchall()
         return results
@@ -43,7 +45,8 @@ def get_subscribers():
 def add_subscriber(line_chat_id):
     try:
         global conn, cursor
-        if conn is None or cursor is None: conn, cursor = get_connection()
+        if conn is None or cursor is None: 
+            conn, cursor = get_connection()
         cursor.execute("""
             INSERT INTO linebot (line_chat_id)
             VALUES (%s)
@@ -56,7 +59,8 @@ def add_subscriber(line_chat_id):
 def delete_subscriber(line_chat_id):
     try:
         global conn, cursor
-        if conn is None or cursor is None: conn, cursor = get_connection()
+        if conn is None or cursor is None: 
+            conn, cursor = get_connection()
         cursor.execute("DELETE FROM linebot WHERE line_chat_id = %s",(line_chat_id))
         return True
     except Exception as e:
@@ -66,7 +70,8 @@ def delete_subscriber(line_chat_id):
 def add_stock(stock_date,company_name,company_code,price,investmentbank_volume):
     try:
         global conn, cursor
-        if conn is None or cursor is None: conn, cursor = get_connection()
+        if conn is None or cursor is None: 
+            conn, cursor = get_connection()
         cursor.execute("""
             INSERT INTO stock_info (stock_date, company_name, company_code, price, investmentbank_volume)
             VALUES (%s,%s,%s,%s,%s)
@@ -79,7 +84,8 @@ def add_stock(stock_date,company_name,company_code,price,investmentbank_volume):
 def get_stock():
     try:
         global conn, cursor
-        if conn is None or cursor is None: conn, cursor = get_connection()
+        if conn is None or cursor is None: 
+            conn, cursor = get_connection()
         cursor.execute("SELECT * FROM stock_info")
         results = cursor.fetchall()
         return results
