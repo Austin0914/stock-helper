@@ -97,7 +97,7 @@ def get_stock(time):
 
 def get_result(time):
     stockdata = get_stock(time)
-    if not results:
+    if not stockdata:
         return "今日無符合條件的股票"
     result_str = f"今日({time})符合條件的有:\n"
     for stock in stockdata:
