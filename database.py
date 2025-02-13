@@ -88,7 +88,8 @@ def get_stock(time):
         global conn, cursor
         if conn is None or cursor is None: 
             conn, cursor = get_connection()
-        results = cursor.execute("SELECT * FROM stock_info WHERE stock_date = %s", (time,))
+        cursor.execute("SELECT * FROM stock_info WHERE stock_date = %s", (time,))
+        results = cursor.fetchall()
         return results
     except Exception as e:
         print(e)
@@ -96,7 +97,7 @@ def get_stock(time):
 
 def get_result(time):
     stockdata = get_stock(time)
-    if len(stockdata) == 0:
+    if not results:
         return "今日無符合條件的股票"
     result_str = f"今日({time})符合條件的有:\n"
     for stock in stockdata:
