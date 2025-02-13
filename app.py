@@ -31,7 +31,8 @@ def callback():
     return 'OK'
 
 def run_stock_info():
-    company_name = stock_info.main() 
+    company_name = stock_info.main()
+    print(company_name) 
     if len(company_name) != 0:
         for it in company_name:
             database.add_stock(it[0], it[1], it[2], it[3], it[4])  # 股票日期, 公司名稱, 公司代碼, 股價, 投信買超金額
@@ -96,7 +97,7 @@ def handle_message(event):
         TextSendMessage(text=reply_text)
     )
 
-# run_stock_info()
+run_stock_info()
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=10000)
