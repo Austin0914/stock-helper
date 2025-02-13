@@ -101,4 +101,5 @@ def get_result(time):
     result_str = f"今日({time})符合條件的有:'\n'"
     for stock in stockdata:
         result_str += f"{stock[2]}{str(stock[3])} 今日收盤價格{str(stock[4])} 買賣超{str(stock[4]*stock[5]/10)}萬元\n"
+    print(result_str)
     return result_str
