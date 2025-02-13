@@ -77,26 +77,25 @@ def add_stock(stock_date,company_name,company_code,price,investmentbank_volume):
             INSERT INTO stock_info (stock_date, company_name, company_code, price, investmentbank_volume)
             VALUES (%s,%s,%s,%s,%s)
         """,(stock_date,company_name,company_code,price,investmentbank_volume))
+        conn.commit()
         return True
     except Exception as e:
         print(e)
         return False
 
-def get_stock():
+def get_stock(time):
     try:
         global conn, cursor
         if conn is None or cursor is None: 
             conn, cursor = get_connection()
-        cursor.execute("SELECT * FROM stock_info")
-        results = cursor.fetchall()
-        conn.commit()
+        results = cursor.execute("SELECT * FROM stock_info WHERE stock_date = %s", (time,))
         return results
     except Exception as e:
         print(e)
         return False
 
 def get_result(time):
-    stockdata = [stock for stock in get_stock() if stock[1] == time]
+    stockdata = get_stock(time)
     if len(stockdata) == 0:
         return "今日無符合條件的股票"
     result_str = f"今日({time})符合條件的有:'\n'"
