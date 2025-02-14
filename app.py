@@ -41,6 +41,8 @@ def run_stock_info():
         database.add_compute_history(datetime.datetime.now(pytz.timezone("Asia/Taipei")).strftime("%Y-%m-%d"))
     if not sendORNOT:
         send_resultToSubscribers()
+    if computeORNOT and sendORNOT:
+        database.close_connection()
 
 def send_resultToSubscribers():
     subscribers = database.get_subscribers()
@@ -69,6 +71,10 @@ def handle_message(event):
     #     # line_bot_api.show_loading_animation(ShowLoadingAnimationRequest(chatId=event.source.user_id, loadingSeconds=60))
     #     run_stock_info(event)
     #     return 
+    if "推送給所有人" in incoming_text:
+        if event.source.user_id == os.environ.get('ADMIN_USER_ID'):
+            send_resultToSubscribers()
+        return
     if "訂閱" in incoming_text:
         reply_text = '訂閱成功' if database.add_subscriber(event.source.user_id) else '訂閱失敗'
         database.close_connection()
