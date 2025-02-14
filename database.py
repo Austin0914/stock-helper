@@ -104,3 +104,44 @@ def get_result(time):
         result_str += f"{stock[2]}{str(stock[3])} 今日收盤價格{str(stock[4])} 買賣超{str(stock[4]*stock[5]/10)}萬元\n"
     print(result_str)
     return result_str
+
+def get_compute_history(time):
+    try:
+        global conn, cursor
+        if conn is None or cursor is None: 
+            conn, cursor = get_connection()
+        cursor.execute("SELECT * FROM compute_history WHERE date = %s", (time,))
+        results = cursor.fetchall()
+        if not results:
+            return False, False
+        else:
+            return True, results[0][2]
+    except Exception as e:
+        print(e)
+
+def update_compute_history(time,send_or_not):
+    try:
+        global conn, cursor
+        if conn is None or cursor is None: 
+            conn, cursor = get_connection()
+        cursor.execute("UPDATE compute_history SET send_or_not = %s WHERE date = %s",(send_or_not,time))
+        conn.commit()
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+def add_compute_history(time):
+    try:
+        global conn, cursor
+        if conn is None or cursor is None: 
+            conn, cursor = get_connection()
+        cursor.execute("""
+            INSERT INTO compute_history (date, send_or_not)
+            VALUES (%s,%s)
+        """,(time,False))
+        conn.commit()
+        return True
+    except Exception as e:
+        print(e)
+        return False

@@ -31,19 +31,22 @@ def callback():
     return 'OK'
 
 def run_stock_info():
-    company_name = stock_info.main()
-    print(company_name) 
-    if len(company_name) != 0:
-        for it in company_name:
-            database.add_stock(it[0], it[1], it[2], it[3], it[4])  # 股票日期, 公司名稱, 公司代碼, 股價, 投信買超金額
-    send_resultToSubscribers()
+    computeORNOT , sendORNOT = database.get_compute_history(datetime.datetime.now(pytz.timezone("Asia/Taipei")).strftime("%Y-%m-%d"))
+    if not computeORNOT:
+        company_name = stock_info.main()
+        print(company_name) 
+        if len(company_name) != 0:
+            for it in company_name:
+                database.add_stock(it[0], it[1], it[2], it[3], it[4])  # 股票日期, 公司名稱, 公司代碼, 股價, 投信買超金額
+        database.add_compute_history(datetime.datetime.now(pytz.timezone("Asia/Taipei")).strftime("%Y-%m-%d"))
+    if not sendORNOT:
+        send_resultToSubscribers()
 
 def send_resultToSubscribers():
     subscribers = database.get_subscribers()
     if not subscribers:
         return
-    # reply_text = database.get_result(datetime.datetime.now(pytz.timezone("Asia/Taipei")).strftime("%Y-%m-%d"))
-    reply_text = database.get_result("2025-02-13")
+    reply_text = database.get_result(datetime.datetime.now(pytz.timezone("Asia/Taipei")).strftime("%Y-%m-%d"))
     print(reply_text)
     for subscriber_id in subscribers:
         print(subscriber_id[1])
@@ -51,6 +54,7 @@ def send_resultToSubscribers():
             subscriber_id[1],
             TextSendMessage(text=reply_text)
         )
+    database.update_compute_history(datetime.datetime.now(pytz.timezone("Asia/Taipei")).strftime("%Y-%m-%d"),True)
     database.close_connection()
     print("成公推送給訂閱者")
 
