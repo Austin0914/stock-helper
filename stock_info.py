@@ -16,6 +16,10 @@ TWSE_price = 'https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL'
 
 TPEX_price = 'https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes'
 
+TWSE_price_web = 'https://www.twse.com.tw/rwd/zh/afterTrading/STOCK_DAY_ALL'
+
+TPEX_price_web = 'https://www.tpex.org.tw/www/zh-tw/afterTrading/dailyQuotes'
+
 def caluate_date():
     with open('./data/TWSEandTPEX_opendate.csv', 'r+', encoding='utf-8') as file:
         reader = csv.reader(file)
@@ -106,7 +110,7 @@ def get_rail_data(howManyDaysNeedToGet,opendate_FromToday):
             url = TWSE_investmentbanks.format(TIME=time_str)
             download(url=url,ticker=f"twse_investmentbanks_{time_str}",filetype="json")
     
-        time_str  = opendate_FromToday[i].replace('-', '%2F')
+        time_str = opendate_FromToday[i].replace('-', '%2F')
         time_str_name = opendate_FromToday[i].replace('-', '')
         
         if os.path.exists(f"./data/untreated_data/tpex_investmentbanks_buy_{time_str_name}.csv"):
@@ -122,27 +126,39 @@ def get_rail_data(howManyDaysNeedToGet,opendate_FromToday):
             download(url=url,ticker=f"tpex_investmentbanks_sell_{time_str}",filetype="csv")
 
         time.sleep(1)
-    get_today_price()
+    get_today_price("web")
     caluate_investmentbanks_avgBS(howManyDaysNeedToGet,opendate_FromToday)
 
 def call_yfinance(ticker="",howlongfromToday="1mo"):
     data = yf.Tickers(ticker).history(period=howlongfromToday)
     return data
 
-def get_today_price():
+def get_today_price(source="web"):
     try:
-        headers = {
-            "accept": "text/csv"
-        }
-        response = requests.get(TWSE_price, headers=headers)
-        response.raise_for_status()
-        response.encoding = 'utf-8'
-        df_twse = pd.read_csv(StringIO(response.text))
+        if source == "web":
+            response = requests.get(TWSE_price_web)
+            response.raise_for_status()
+            json_data = response.json()
+            df_twse = pd.DataFrame(json_data["data"], columns=json_data["fields"])
 
-        response = requests.get(TPEX_price, headers=headers)
-        response.raise_for_status()
-        response.encoding = 'utf-8'
-        df_tpex = pd.read_csv(StringIO(response.text))
+            response = requests.get(TPEX_price_web)
+            response.raise_for_status()
+            table = response.json()["tables"][0]
+            df_tpex = pd.DataFrame(table["data"], columns=table["fields"])
+
+        else:
+            headers = {
+                "accept": "text/csv"
+            }
+            response = requests.get(TWSE_price, headers=headers)
+            response.raise_for_status()
+            response.encoding = 'utf-8'
+            df_twse = pd.read_csv(StringIO(response.text))
+
+            response = requests.get(TPEX_price, headers=headers)
+            response.raise_for_status()
+            response.encoding = 'utf-8'
+            df_tpex = pd.read_csv(StringIO(response.text))
 
         all_data = pd.read_csv('./data/all.csv')
         all_data["今日價格"] = None
@@ -313,6 +329,8 @@ def main():
         - [OK✅] get rail data
         - [OK✅] clean data 
         - check if the data is already downloaded
+    - 證交所&櫃買中心api [🆘]資料更新時間過慢，無法在當天晚上8點就更新資料
+        - [OK✅] 替換爬蟲官方網站的資訊
 - refresh data->
     - [OK✅] modify the date
     - [OK✅] caluate the avg BS
