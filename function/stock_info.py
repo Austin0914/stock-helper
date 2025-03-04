@@ -1,5 +1,6 @@
 import requests
 import json
+import logging
 import pandas as pd
 from io import StringIO
 import time
@@ -99,20 +100,23 @@ def get_today_price(source="web", all_data=None):
 
 def download(url="", filetype=""):
     # 下載資料並直接返回變數
-    if filetype == "json":
-        response = requests.get(url)
-        response.raise_for_status()
-        json_data = response.json()
-        df = pd.DataFrame(json_data["data"], columns=json_data["fields"])
-        df = df.drop(df.columns[0], axis=1)
-    elif filetype == "csv":
-        response = requests.get(url)
-        response.raise_for_status()
-        df = pd.read_csv(StringIO(response.text), skiprows=1)
-        df = df[:-1]
-        df.reset_index(drop=True, inplace=True)
-    else:
-        raise ValueError("請輸入正確的檔案格式")
+    try:
+        if filetype == "json":
+            response = requests.get(url)
+            response.raise_for_status()
+            json_data = response.json()
+            df = pd.DataFrame(json_data["data"], columns=json_data["fields"])
+            df = df.drop(df.columns[0], axis=1)
+        elif filetype == "csv":
+            response = requests.get(url)
+            response.raise_for_status()
+            df = pd.read_csv(StringIO(response.text), skiprows=1)
+            df = df[:-1]
+            df.reset_index(drop=True, inplace=True)
+        else:
+            raise ValueError("請輸入正確的檔案格式")
+    except Exception as e:
+        logging.info('Error Downloading Data: ' + url)
     return df
 
 def updateCompany():

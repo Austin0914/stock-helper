@@ -11,6 +11,8 @@ from linebot.exceptions import InvalidSignatureError
 from function import stock_info
 from function import database
 
+
+# 🆘全域變數會不好測試，如果改成在函數間傳遞會更好
 # Initialize LINE components
 line_bot_api = LineBotApi(os.environ.get('LINE_CHANNEL_ACCESS_TOKEN'))
 handler = WebhookHandler(os.environ.get('LINE_CHANNEL_SECRET'))
@@ -23,6 +25,8 @@ def handle_message(event):
         if event.source.user_id == os.environ.get('ADMIN_USER_ID'):
             send_resultToSubscribers()
         return
+    
+    # 🆘將訂閱和取消分開寫更好的來測試
     if "訂閱" in incoming_text:
         reply_text = '訂閱成功' if database.add_subscriber(event.source.user_id) else '訂閱失敗'
         database.close_connection()
@@ -70,6 +74,7 @@ def run_stock_info():
         database.add_compute_history(now_str)
     if not sendORNOT:
         send_resultToSubscribers()
+    # 🆘在database close的部分可以用finally可以
     if computeORNOT and sendORNOT:
         database.close_connection()
 
@@ -114,8 +119,10 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     except Exception as e:
         logging.error("Error processing webhook: " + str(e))
         return func.HttpResponse("Internal Server Error", status_code=500)
+    #如果能增加更多錯誤處理的話，可以在後期logging.info()來看錯誤訊息，方便debug
     return func.HttpResponse("OK", status_code=200)
 
+# 🆘時間上的設定可以不用直接設在程式裡面，可以透過其他方式去設定這樣可以讓維護更加簡單
 @app.timer_trigger(schedule="0 30 12 * * 1-5", arg_name="myTimer", run_on_startup=False,use_monitor=False) 
 def timer_trigger(myTimer: func.TimerRequest) -> None:
     logging.info('Received a timer trigger.')
@@ -128,4 +135,12 @@ def timer_trigger(myTimer: func.TimerRequest) -> None:
 2.我今天要開發程式時，我該如何去做測試?每次都要部屬到sever才能測試?要用print嗎?還是要用log呢?
 3.今天應該要如何更有效的去測試呢?只能實際部屬到雲端才能有作用嗎?像是測試linebot機器人這樣
 4.今天遇到這種換伺服器的狀況導致，有很多地方需要去做測試及改變，是因為我原本程式寫得不夠好嗎?
+
+
+🔍🔍🔍🔍
+- 一些參數像是網址、觸發時間等等可以透過設定檔來設定，這樣可以讓程式更加的靈活
+- 一些全域變數可以透過函數間傳遞來取代，這樣可以讓程式更好測試
+- 一些程式碼可以透過try except finally來做更好的錯誤處理，透過finally可以確保程式在任何情況下都會執行(讓database close的部分可以用finally可以)
+
 '''
+
