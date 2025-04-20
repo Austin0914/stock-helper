@@ -23,35 +23,34 @@ def caluate_investmentbanks_avgBS(opendate_FromToday, all_data):
     all_data["當日投信買賣超"] = 0
 
     for i in range(len(opendate_FromToday)):
-        time_today = opendate_FromToday[i].replace('-', '')
+        time_today = opendate_FromToday[i]
         index_str = "當日投信買賣超" if i == 0 else "前9日加總買賣超"
-        
         # 從 TWSE 下載資料並儲存在變數中
-        byorsell_data_twse = download(TWSE_investmentbanks.format(TIME=time_today), filetype="json")
-        for j, company_name in enumerate(byorsell_data_twse[byorsell_data_twse.columns[1]]):
-            stock_code = str(company_name).strip()
+        byorsell_data_twse = download(TWSE_investmentbanks.format(TIME=time_today.replace('-', '')), filetype="json")
+        for j, company_numbers in enumerate(byorsell_data_twse[byorsell_data_twse.columns[0]]):
+            stock_code = str(company_numbers).strip()
             matching_rows = all_data[all_data['股票代號'].astype(str).str.strip() == stock_code]
             if not matching_rows.empty:
                 index_val = matching_rows.index[0]
-                all_data.loc[index_val, index_str] += round(int(str(byorsell_data_twse[byorsell_data_twse.columns[5]][j]).replace(',', '')) / 1000)
+                all_data.loc[index_val, index_str] += round(int(str(byorsell_data_twse[byorsell_data_twse.columns[4]][j]).replace(',', '')) / 1000)
 
         # 從 TPEX 下載買超資料並儲存在變數中
         byorsell_data_tpex_buy = download(TPEX_investmentbanks.format(TIME=time_today.replace('-', '%2F'), BUYorSELL="buy"), filetype="csv")
-        for j, company_name in enumerate(byorsell_data_tpex_buy[byorsell_data_tpex_buy.columns[2]]):
-            stock_code = str(company_name).strip()[:4]
+        for j, company_numbers in enumerate(byorsell_data_tpex_buy[byorsell_data_tpex_buy.columns[1]]):
+            stock_code = str(company_numbers).strip().split(".")[0]
             matching_rows = all_data[all_data['股票代號'].astype(str).str.strip() == stock_code]
             if not matching_rows.empty:
                 index_val = matching_rows.index[0]
-                all_data.loc[index_val, index_str] += int(float(str(byorsell_data_tpex_buy[byorsell_data_tpex_buy.columns[6]][j]).replace(',', '')))
+                all_data.loc[index_val, index_str] += int(float(str(byorsell_data_tpex_buy[byorsell_data_tpex_buy.columns[5]][j]).replace(',', '')))
 
         # 從 TPEX 下載賣超資料並儲存在變數中
         byorsell_data_tpex_sell = download(TPEX_investmentbanks.format(TIME=time_today.replace('-', '%2F'), BUYorSELL="sell"), filetype="csv")
-        for j, company_name in enumerate(byorsell_data_tpex_sell[byorsell_data_tpex_sell.columns[2]]):
-            stock_code = str(company_name).strip()[:4]
+        for j, company_numbers in enumerate(byorsell_data_tpex_sell[byorsell_data_tpex_sell.columns[1]]):
+            stock_code = str(company_numbers).strip().split(".")[0]
             matching_rows = all_data[all_data['股票代號'].astype(str).str.strip() == stock_code]
             if not matching_rows.empty:
                 index_val = matching_rows.index[0]
-                all_data.loc[index_val, index_str] += int(float(str(byorsell_data_tpex_sell[byorsell_data_tpex_sell.columns[6]][j]).replace(',', '')))
+                all_data.loc[index_val, index_str] += int(float(str(byorsell_data_tpex_sell[byorsell_data_tpex_sell.columns[5]][j]).replace(',', '')))
 
     return all_data
 
@@ -107,17 +106,18 @@ def download(url="", filetype=""):
             json_data = response.json()
             df = pd.DataFrame(json_data["data"], columns=json_data["fields"])
             df = df.drop(df.columns[0], axis=1)
+            return df
         elif filetype == "csv":
             response = requests.get(url)
             response.raise_for_status()
             df = pd.read_csv(StringIO(response.text), skiprows=1)
             df = df[:-1]
             df.reset_index(drop=True, inplace=True)
+            return df
         else:
             raise ValueError("請輸入正確的檔案格式")
     except Exception as e:
         logging.info('Error Downloading Data: ' + url)
-    return df
 
 def updateCompany():
     # 從網站下載公司資料並儲存在變數中
